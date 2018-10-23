@@ -54,4 +54,4 @@ class WingLossLayer : public LossLayer<Dtype> {
 
 }  // namespace caffe
 
-#endif  // CAFFE_FAST_RCNN_LAYERS_HPP_
+#endif  // CAFFE_WING_LOSS_LAYERS_HPP_
