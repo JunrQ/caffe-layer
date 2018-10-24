@@ -1,3 +1,5 @@
+// Clone from https://github.com/suzhenghang/MobileNetv2
+
 #include <vector>
 #include "caffe/layers/conv_dw_layer.hpp"
 #include "caffe/util/gpu_util.cuh"

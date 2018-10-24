@@ -1,3 +1,5 @@
+// Clone from https://github.com/suzhenghang/MobileNetv2
+
 #include <algorithm>
 #include <vector>
 #include "caffe/filler.hpp"

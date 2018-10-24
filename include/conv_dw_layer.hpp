@@ -1,3 +1,5 @@
+// Clone from https://github.com/suzhenghang/MobileNetv2
+
 #ifndef CAFFE_CONV_DW_LAYER_HPP_
 #define CAFFE_CONV_DW_LAYER_HPP_
 
