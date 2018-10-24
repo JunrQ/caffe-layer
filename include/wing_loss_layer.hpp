@@ -50,6 +50,7 @@ class WingLossLayer : public LossLayer<Dtype> {
   float epsilon_;
   float C_;
   bool has_weights_;
+  Dtype norm_value_;
 };
 
 }  // namespace caffe
