@@ -71,7 +71,7 @@ __global__ void WingBackward(const int n, const Dtype* in, Dtype* out,
     Dtype val = in[index];
     Dtype abs_val = abs(val);
     Dtype sign = (Dtype(0) < val) - (val < Dtype(0));
-    if (abs_val < 1) {
+    if (abs_val < omega) {
       out[index] = sign * omega / (1 + abs_val / epsilon) / epsilon;
     } else {
       out[index] = sign;
