@@ -15,9 +15,11 @@ __global__ void Coord2heatmapForward(const int n,
     int b = index % batch_size;
     int c = index / batch_size;
 
-    int x = in[batch_size * b + 2 * c];
-    int y = in[batch_size * b + 2 * c + 1];
-    out[((n * num_points + c) * height + y) * width + x] = Dtype(1.);
+    int x = (int)in[batch_size * b + 2 * c];
+    int y = (int)in[batch_size * b + 2 * c + 1];
+    if (x > 0 && y > 0) {
+      out[((n * num_points + c) * height + y) * width + x] = Dtype(1);
+    }
   }
 }
 
