@@ -9,3 +9,12 @@ message Coord2heatmapParameter {
   optional uint32 width = 2;
   optional uint32 num_points = 3;
 }
+
+message HeatmapLossParameter {
+  enum LossType {
+    CE = 0;
+  }
+  optional LossType loss_type = 1 [default = CE];
+  optional float negative_ratio = 2 [default = 0.0001];
+  optional float eps = 3 [default = 1e-8];
+}
