@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "caffe/blob.hpp"
-#include "caffe/commom.hpp"
+#include "caffe/common.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/layers/loss_layer.hpp"
 #include "caffe/proto/caffe.pb.h"
@@ -15,7 +15,7 @@ template <typename Dtype>
 class HeatmapLossLayer : public LossLayer<Dtype> {
   public:
     explicit HeatmapLossLayer(const LayerParameter& param)
-        : LossLayer<Dtype>(param), diff_() {}
+        : LossLayer<Dtype>(param), errors_() {}
     virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         const vector<Blob<Dtype>*>& top);
     virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
@@ -42,7 +42,7 @@ class HeatmapLossLayer : public LossLayer<Dtype> {
     bool has_weights_;
     Dtype negative_ratio_;
     Dtype eps_;
-}
+};
 
 
 } // namespace caffe

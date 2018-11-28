@@ -6,8 +6,8 @@ template <typename Dtype>
 void HeatmapLossLayer<Dtype>::LayerSetUp(
   const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
     has_weights_ = (bottom.size() == 3);
-    negative_ratio_ = (Dtype)this->params_.negative_ratio();
-    eps_ = (Dtype)this->params_.eps();
+    negative_ratio_ = (Dtype)this->layer_param_.heatmap_loss_param().negative_ratio();
+    eps_ = (Dtype)this->layer_param_.heatmap_loss_param().eps();
   }
 
   template <typename Dtype>

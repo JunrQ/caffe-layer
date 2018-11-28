@@ -12,13 +12,13 @@ __global__ void CE(const int n, const Dtype* gt, const Dtype* pred,
     if (gt_ == Dtype(0)) {
       out[index] *= negative_ratio;
     }
-    out[index] = -out[index]
+    out[index] = -out[index];
   }
 }
 
 template <typename Dtype>
 __global__ void CE_mask(const int n, const Dtype* gt, const Dtype* pred, 
-    Dtype* out, Dtype* mask, Dtype negative_ratio,
+    Dtype* out, const Dtype* mask, Dtype negative_ratio,
     int w, int h, int c, Dtype eps) {
   CUDA_KERNEL_LOOP(index, n) {
     int chn = index / w / h % c;
@@ -47,7 +47,7 @@ __global__ void bp_CE(const int n, const Dtype* gt, const Dtype* pred,
 
 template <typename Dtype>
 __global__ void bp_CE_mask(const int n, const Dtype* gt, const Dtype* pred,
-    Dtype* out, Dtype* mask, Dtype negative_ratio,
+    Dtype* out, const Dtype* mask, Dtype negative_ratio,
     int w, int h, int c, Dtype eps) {
   CUDA_KERNEL_LOOP(index, n) {
     int chn = index / w / h % c;
@@ -65,7 +65,7 @@ __global__ void bp_CE_mask(const int n, const Dtype* gt, const Dtype* pred,
 template <typename Dtype>
 void HeatmapLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-    switch (this->layer_param_.heatmap_loss_params().loss_type()) {
+    switch (this->layer_param_.heatmap_loss_param().loss_type()) {
     case HeatmapLossParameter_LossType_CE:
       int count = bottom[0]->count();
       if (has_weights_) {
@@ -92,19 +92,20 @@ void HeatmapLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void HeatmapLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-    switch (this->layer_param_.heatmap_loss_params().loss_type()) {
+    switch (this->layer_param_.heatmap_loss_param().loss_type()) {
       case HeatmapLossParameter_LossType_CE:
+        int count = bottom[0]->count();
         if (has_weights_) {
           bp_CE_mask<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
-            count, top[0]->gpu_data(), top[1]->gpu_data(), 
-            bottom[1]->mutable_gpu_data(), top[2]->gpu_data(),
-            negative_ratio_, top[0]->shape(3),
-            top[0]->shape(2), top[0]->shape(1), eps_);
+            count, bottom[0]->gpu_data(), bottom[1]->gpu_data(), 
+            bottom[1]->mutable_gpu_diff(), bottom[2]->gpu_data(),
+            negative_ratio_, bottom[0]->shape(3),
+            bottom[0]->shape(2), bottom[0]->shape(1), eps_);
           CUDA_POST_KERNEL_CHECK;
         } else {
           bp_CE<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
-            count, top[0]->gpu_data(), top[1]->gpu_data(), 
-            bottom[1]->mutable_gpu_data(), top[2]->gpu_data(),
+            count, bottom[0]->gpu_data(), bottom[1]->gpu_data(), 
+            bottom[1]->mutable_gpu_diff(),
             negative_ratio_, eps_);
           CUDA_POST_KERNEL_CHECK;
         }
