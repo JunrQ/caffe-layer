@@ -13,7 +13,8 @@ void Coord2heatmapLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   CHECK_GT(output_width_, 0) << "Coord2heatmapLayer width must be positive.";
   num_points_ = this->layer_param_.coord2heatmap_param().num_points();
   CHECK_GT(num_points_, 0) << "Coord2heatmapLayer num_points must be positive.";
-  int bottom_points = bottom[0]->shape(0) / 2;
+  // LOG(INFO) << bottom[0]->shape_string();
+  int bottom_points = bottom[0]->shape(1) / 2;
   CHECK_LE(num_points_, bottom_points) << "Coord2heatmapLayer num_points must "
       "be less or equal to number of inputs points.";
 }
@@ -21,11 +22,7 @@ void Coord2heatmapLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void Coord2heatmapLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  vector<int> top_shape = bottom[0]->shape();
-  top_shape[1] = num_points_;
-  top_shape.push_back(output_height_);
-  top_shape.push_back(output_width_);
-  top[0]->Reshape(top_shape);
+  top[0]->Reshape(bottom[0]->shape(0), num_points_, output_height_, output_width_);
   caffe_set(top[0]->count(), Dtype(0), top[0]->mutable_cpu_data());
 }
 
