@@ -1,0 +1,11 @@
+
+message WingLossParameter {
+  optional float omega = 1 [default = 10];
+  optional float epsilon = 2 [default = 2];
+}
+
+message Coord2heatmapParameter {
+  optional uint32 height = 1;
+  optional uint32 width = 2;
+  optional uint32 num_points = 3;
+}
