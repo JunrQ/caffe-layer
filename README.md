@@ -10,3 +10,6 @@ Clone from https://github.com/suzhenghang/MobileNetv2
 
 # coord2heatmap layer
 Turn coordinates into heatmaps.
+
+# heatmap loss layer
+Define loss for heatmap regression.
