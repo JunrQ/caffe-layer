@@ -23,7 +23,7 @@ __global__ void CE_mask(const int n, const Dtype* gt, const Dtype* pred,
   CUDA_KERNEL_LOOP(index, n) {
     int chn = index / w / h % c;
     int batch_idx = index / w / h / c;
-    Dtype m = mask[batch_idx * c + 2 * chn];
+    Dtype m = mask[batch_idx * c * 2 + 2 * chn];
     if (m == Dtype(0)) {
       out[index] = Dtype(0);
     } else {
@@ -58,13 +58,19 @@ __global__ void bp_CE_mask(const int n, const Dtype* gt, const Dtype* pred,
   CUDA_KERNEL_LOOP(index, n) {
     int chn = index / w / h % c;
     int batch_idx = index / w / h / c;
-    Dtype gt_ = gt[index];
-    Dtype pred_ = pred[index];
-    out[index] = (1 - gt_) / (1 - pred_ + eps) - gt_ / (pred_ + eps);
-    if (gt_ == Dtype(0)) {
-      out[index] *= negative_ratio;
+    Dtype m = mask[batch_idx * c * 2 + 2 * chn];
+    if (Dtype(0) == m) {
+      out[index] = Dtype(0);
+    } else {
+      Dtype gt_ = gt[index];
+      Dtype pred_ = pred[index];
+      out[index] = (1 - gt_) / (1 - pred_ + eps) - gt_ / (pred_ + eps);
+      if (gt_ == Dtype(0)) {
+        out[index] *= negative_ratio;
+      }
+      out[index] *= m;
     }
-    out[index] *= mask[batch_idx * c + 2 * chn];
+    
   }
 }
 
