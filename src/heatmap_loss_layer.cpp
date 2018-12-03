@@ -8,6 +8,10 @@ void HeatmapLossLayer<Dtype>::LayerSetUp(
     has_weights_ = (bottom.size() == 3);
     negative_ratio_ = (Dtype)this->layer_param_.heatmap_loss_param().negative_ratio();
     eps_ = (Dtype)this->layer_param_.heatmap_loss_param().eps();
+    grad_clip_ = (Dtype)this->layer_param_.heatmap_loss_param().grad_clip();
+    negative_sample_prob_ = this->layer_param_.heatmap_loss_param().negative_sample_prob();
+    CHECK_LE(negative_sample_prob_, 1.);
+    CHECK_GE(negative_sample_prob_, 0.);
   }
 
 template <typename Dtype>
@@ -21,6 +25,9 @@ void HeatmapLossLayer<Dtype>::Reshape(
       CHECK_EQ(bottom[0]->channels(), bottom[2]->shape(1) / 2);
     }
     diff_.Reshape(bottom[0]->shape());
+    // if (negative_sample_prob_ < 0.9999) {
+    rand_mask_.Reshape(bottom[0]->shape());
+    // }
     vector<int> loss_shape(0);
     top[0]->Reshape(loss_shape);
   }

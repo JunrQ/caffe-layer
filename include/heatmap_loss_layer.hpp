@@ -42,6 +42,9 @@ class HeatmapLossLayer : public LossLayer<Dtype> {
     bool has_weights_;
     Dtype negative_ratio_;
     Dtype eps_;
+    Dtype grad_clip_;
+    float negative_sample_prob_;
+    Blob<float> rand_mask_;
 };
 
 
