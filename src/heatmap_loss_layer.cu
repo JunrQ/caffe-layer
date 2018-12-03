@@ -23,13 +23,18 @@ __global__ void CE_mask(const int n, const Dtype* gt, const Dtype* pred,
   CUDA_KERNEL_LOOP(index, n) {
     int chn = index / w / h % c;
     int batch_idx = index / w / h / c;
-    Dtype gt_ = gt[index];
-    Dtype pred_ = pred[index];
-    out[index] = negative_ratio * (gt_ * log(pred_ + eps) + (1 - gt_) * log(1 - pred_ + eps));
-    if (gt_ == Dtype(0)) {
-      out[index] *= negative_ratio;
+    Dtype m = mask[batch_idx * c + 2 * chn];
+    if (m == Dtype(0)) {
+      out[index] = Dtype(0);
+    } else {
+      Dtype gt_ = gt[index];
+      Dtype pred_ = pred[index];
+      out[index] = negative_ratio * (gt_ * log(pred_ + eps) + (1 - gt_) * log(1 - pred_ + eps));
+      if (gt_ == Dtype(0)) {
+        out[index] *= negative_ratio;
+      }
+      out[index] = -out[index] * m;
     }
-    out[index] = -out[index] * mask[batch_idx * c + 2 * chn];
   }
 }
 
@@ -69,24 +74,30 @@ void HeatmapLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
     switch (this->layer_param_.heatmap_loss_param().loss_type()) {
     case HeatmapLossParameter_LossType_CE:
-      int count = bottom[0]->count();
+      int count = diff_.count();
+      // LOG(INFO) << diff_.shape()[0] << ' ' << diff_.shape()[1]
+      //           << ' ' << diff_.shape()[2]
+      //           << ' ' << diff_.shape()[3];
       if (has_weights_) {
         CE_mask<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
           count, bottom[0]->gpu_data(), bottom[1]->gpu_data(), 
-          errors_.mutable_gpu_data(), bottom[2]->gpu_data(),
+          diff_.mutable_gpu_data(),
+          bottom[2]->gpu_data(),
           negative_ratio_, bottom[0]->shape(3),
           bottom[0]->shape(2), bottom[0]->shape(1), eps_);
         CUDA_POST_KERNEL_CHECK;
       } else {
         CE<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
           count, bottom[0]->gpu_data(), bottom[1]->gpu_data(), 
-          errors_.mutable_gpu_data(), negative_ratio_, eps_);
+          diff_.mutable_gpu_data(), negative_ratio_, eps_);
         CUDA_POST_KERNEL_CHECK;
       }
 
       Dtype loss;
-      caffe_gpu_asum(count, errors_.gpu_data(), &loss);
-      top[0]->mutable_gpu_data()[0] = loss;
+      // loss = diff_.asum_data();
+      caffe_gpu_asum(count, diff_.gpu_data(), &loss);
+      // LOG(INFO) << loss;
+      top[0]->mutable_cpu_data()[0] = loss;
       break;
     }
   }

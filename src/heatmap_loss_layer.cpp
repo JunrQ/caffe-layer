@@ -20,8 +20,9 @@ void HeatmapLossLayer<Dtype>::Reshape(
     if (has_weights_) {
       CHECK_EQ(bottom[0]->channels(), bottom[2]->shape(1) / 2);
     }
-    errors_.Reshape(bottom[0]->num(), bottom[0]->channels(),
-        bottom[0]->height(), bottom[0]->width());
+    diff_.Reshape(bottom[0]->shape());
+    vector<int> loss_shape(0);
+    top[0]->Reshape(loss_shape);
   }
 
 template <typename Dtype> 

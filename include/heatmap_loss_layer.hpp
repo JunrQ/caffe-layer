@@ -15,7 +15,7 @@ template <typename Dtype>
 class HeatmapLossLayer : public LossLayer<Dtype> {
   public:
     explicit HeatmapLossLayer(const LayerParameter& param)
-        : LossLayer<Dtype>(param), errors_() {}
+        : LossLayer<Dtype>(param), diff_() {}
     virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
         const vector<Blob<Dtype>*>& top);
     virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
@@ -38,7 +38,7 @@ class HeatmapLossLayer : public LossLayer<Dtype> {
     virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
         const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
   
-    Blob<Dtype> errors_;
+    Blob<Dtype> diff_;
     bool has_weights_;
     Dtype negative_ratio_;
     Dtype eps_;
