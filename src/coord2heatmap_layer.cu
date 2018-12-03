@@ -1,4 +1,5 @@
 #include <vector>
+#include <math.h>
 
 #include "caffe/layers/coord2heatmap_layer.hpp"
 
@@ -12,17 +13,18 @@ __global__ void Coord2heatmapForward(const int n,
     const int width,
     const Dtype* in, Dtype* out) {
   CUDA_KERNEL_LOOP(index, n) {
-    int b = index % batch_size;
-    int c = index / batch_size;
-
-    int x = (int)in[batch_size * b + 2 * c];
-    int y = (int)in[batch_size * b + 2 * c + 1];
+    int c = index % num_points;
+    int b = index / num_points;
+    int tmp = 2 * c * (b + 1);
+    int x = int(in[tmp]);
+    int y = int(in[tmp + 1]);
+    x = x > (width - 1) ? width -1 : x;
+    y = y > (height - 1) ? height -1 : y;
     if (x > 0 && y > 0) {
-      out[((n * num_points + c) * height + y) * width + x] = Dtype(1);
+      out[((b * num_points + c) * height + y) * width + x] = Dtype(1);
     }
   }
 }
-
 
 template <typename Dtype>
 void Coord2heatmapLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,

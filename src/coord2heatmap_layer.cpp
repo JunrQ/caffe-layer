@@ -34,8 +34,11 @@ void Coord2heatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const int batch_size =  bottom[0]->shape(0);
   for (int b = 0; b < batch_size; ++b) {
     for (int c = 0; c < num_points_; c++) {
-      int x = (int)bottom_data[batch_size * b + 2 * c];
-      int y = (int)bottom_data[batch_size * b + 2 * c + 1];
+      int tmp = 2 * c * (b + 1);
+      int x = (int)bottom_data[tmp];
+      int y = (int)bottom_data[tmp + 1];
+      x = x > (output_width_ - 1) ? output_width_ -1 : x;
+      y = y > (output_height_ - 1) ? output_height_ -1 : y;
       if (x > 0 && y > 0) {
         top_data[top[0]->offset(b, c, y, x)] = Dtype(1);
       }
