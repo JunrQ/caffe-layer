@@ -8,11 +8,14 @@ message Coord2heatmapParameter {
   optional uint32 height = 1;
   optional uint32 width = 2;
   optional uint32 num_points = 3;
+  optional uint32 max_value = 4 [default = 1];
+  optional uint32 radius = 5 [default = 5];
 }
 
 message HeatmapLossParameter {
   enum LossType {
     CE = 0;
+    SE = 1; // Square error, actually MSE
   }
   optional LossType loss_type = 1 [default = CE];
   optional float negative_ratio = 2 [default = 0.001];
