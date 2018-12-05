@@ -278,7 +278,7 @@ void HeatmapLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       }
 
       caffe_gpu_asum(count, diff_.gpu_data(), &loss);
-      top[0]->mutable_cpu_data()[0] = loss;
+      top[0]->mutable_cpu_data()[0] = loss / (bottom[0]->count(2, 4));
       break;
 
     case HeatmapLossParameter_LossType_SE:
@@ -298,7 +298,7 @@ void HeatmapLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       }
 
       caffe_gpu_asum(count, diff_.gpu_data(), &loss);
-      top[0]->mutable_cpu_data()[0] = loss;
+      top[0]->mutable_cpu_data()[0] = loss / (bottom[0]->count(2, 4));
       break;
     }
   }
@@ -383,6 +383,10 @@ void HeatmapLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         }
       break;
     }
+    caffe_gpu_scal(
+      bottom[1]->count(),
+      1 / bottom[1]->count(2, 4),
+      bottom[1]->mutable_gpu_diff());
   }
 
 INSTANTIATE_LAYER_GPU_FUNCS(HeatmapLossLayer);
