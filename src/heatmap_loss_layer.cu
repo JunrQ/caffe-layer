@@ -385,7 +385,7 @@ void HeatmapLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     }
     caffe_gpu_scal(
       bottom[1]->count(),
-      1 / bottom[1]->count(2, 4),
+      Dtype(1) / bottom[1]->count(2, 4),
       bottom[1]->mutable_gpu_diff());
   }
 
