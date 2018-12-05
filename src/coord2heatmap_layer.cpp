@@ -17,6 +17,13 @@ void Coord2heatmapLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   int bottom_points = bottom[0]->shape(1) / 2;
   CHECK_LE(num_points_, bottom_points) << "Coord2heatmapLayer num_points must "
       "be less or equal to number of inputs points.";
+  max_value_ = this->layer_param_.coord2heatmap_param().max_value();
+  CHECK_GE(max_value_, 1) << "Coord2heatmapLayer max_value must be greater "
+      "or equal to 1";
+  radius_ = this->layer_param_.coord2heatmap_param().radius();
+  if (radius_ != 1)
+    CHECK_EQ(radius_, 5) << "Only support radius 5, you can set radius to 1"
+        "to not use gaussian blur.";
 }
 
 template <typename Dtype>
@@ -40,7 +47,7 @@ void Coord2heatmapLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       x = x > (output_width_ - 1) ? output_width_ -1 : x;
       y = y > (output_height_ - 1) ? output_height_ -1 : y;
       if (x > 0 && y > 0) {
-        top_data[top[0]->offset(b, c, y, x)] = Dtype(1);
+        top_data[top[0]->offset(b, c, y, x)] = Dtype(max_value_);
       }
     }
   }
