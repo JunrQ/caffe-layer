@@ -48,6 +48,8 @@ class Coord2heatmapLayer : public Layer<Dtype> {
     int output_height_;
     int output_width_;
     int num_points_;
+    int max_value_;
+    int radius_;
 };
 
 } // namespace caffe
