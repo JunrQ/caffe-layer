@@ -1,3 +1,8 @@
+// ------------------------------------------------------------------
+// Heatmap Loss layer.
+// Written by ZhouJunr
+// ------------------------------------------------------------------
+
 #ifndef CAFFE_HEATMAP_LOSS_LAYER_HPP_
 #define CAFFE_HEATMAP_LOSS_LAYER_HPP_
 
@@ -10,6 +15,11 @@
 #include "caffe/proto/caffe.pb.h"
 
 namespace caffe {
+
+/**
+ * @brief Heatmap loss layer.
+ * Loss layer for heatmap input.
+ */
 
 template <typename Dtype>
 class HeatmapLossLayer : public LossLayer<Dtype> {
